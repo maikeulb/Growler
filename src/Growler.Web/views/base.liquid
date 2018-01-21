@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://localhost:9000/static/css/app.css">
+		{% block head %}
+		{% endblock %}
+	</head>
+	<body>
+		<div id="content">
+			{% block content %}
+			{% endblock %}
+		</div>
+		<!-- For displaying ajax start and stop -->
+		<div class="modal"></div>
+		
+		<div id="scripts">
+      <script src='http://localhost:9000/static/js/app.bundle.js'></script>
+			{% block scripts %}
+			{% endblock %}
+		</div>		
+	</body>
+</html>
