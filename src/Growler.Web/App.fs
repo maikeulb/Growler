@@ -33,6 +33,7 @@ let main argv =
     choose [
       serveStatic
       path "/" >=> page "main/home.liquid" ""
+      UserRegister.Suave.webPart ()
   ]
 
   startWebServer defaultConfig app

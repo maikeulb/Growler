@@ -1,9 +1,8 @@
 // include Fake libs
 #r "./packages/FAKE/tools/FakeLib.dll"
+
 open Fake
-// Directories
 let buildDir  = "./build/"
-// Filesets
 let appReferences  =
     !! "/**/*.csproj"
     ++ "/**/*.fsproj"
