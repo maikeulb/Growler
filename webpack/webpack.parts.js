@@ -10,7 +10,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const cssnano = require("cssnano");
 
 const assetsDir = path.join('assets');
-const buildDir = path.join('src', 'Growler', 'static');
+const buildDir = path.join('src', 'Growler.Web', 'static');
 const publicPth = path.join('static');
 
 exports.PATHS = {
@@ -21,9 +21,10 @@ exports.PATHS = {
 
 exports.copyWebpackPlugin = () => ({
   plugins: [
-    new CopyWebpackPlugin ([{ 
-      from: 'assets/favicon/favicon.ico', to: 'favicon.ico' 
-    }]),
+    new CopyWebpackPlugin ([
+      { from: 'assets/favicon', to: 'favicon' },
+      { from: 'assets/images', to: 'images' }
+    ]),
   ],
 });
 

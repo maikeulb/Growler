@@ -5,8 +5,49 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+
+<div class="uk-container">
+
+<form>
+    <fieldset class="uk-fieldset">
+
+        <legend class="uk-legend">Legend</legend>
+
+        <div class="uk-margin">
+            <input class="uk-input" type="text" placeholder="Input">
+        </div>
+
+        <div class="uk-margin">
+            <select class="uk-select">
+                <option>Option 01</option>
+                <option>Option 02</option>
+            </select>
+        </div>
+
+        <div class="uk-margin">
+            <textarea class="uk-textarea" rows="5" placeholder="Textarea"></textarea>
+        </div>
+
+        <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+            <label><input class="uk-radio" type="radio" name="radio2" checked> A</label>
+            <label><input class="uk-radio" type="radio" name="radio2"> B</label>
+        </div>
+
+        <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+            <label><input class="uk-checkbox" type="checkbox" checked> A</label>
+            <label><input class="uk-checkbox" type="checkbox"> B</label>
+        </div>
+
+        <div class="uk-margin">
+            <input class="uk-range" type="range" value="2" min="0" max="10" step="0.1">
+        </div>
+
+    </fieldset>
+  </form> 
+
+<div class="uk-container">
   <form class="form-register" method="POST" action="/register">
+    <fieldset class ="uk-fieldset">
     <h2 class="form-register-heading">Join FsTweet Today!</h2>
     {% if model.Error %}
       <p class="alert alert-danger">
@@ -14,15 +55,27 @@
       </p>
     {% endif %}
     <label for="Email" class="sr-only">Email address</label>
-    <input type="email" name="Email" class="form-control" placeholder="Email address" required autofocus value={{ model.Email }}>
-    
+    <input type="email" name="Email" class="uk-input" placeholder="Email address" required autofocus value={{ model.Email }}>
+
     <label for="Username" class="sr-only">Username</label>
-    <input type="text" name="Username" class="form-control" placeholder="Username" required value={{ model.Username }}>
+    <div class="uk-margin">
+        <div class="uk-inline">
+            <input type="text" name="Username" class="uk-input" placeholder="Username" required value={{ model.Username }}>
+        </div>
+    </div>
+
     <label for="Password" class="sr-only">Password</label>
-    <input type="password" name="Password" class="form-control" placeholder="Password" required>
+    <div class="uk-margin">
+        <div class="uk-inline">
+            <span class="uk-form-icon uk-form-icon-flip" uk-icon="icon: lock"></span>
+            <input type="password" name="Password" class="uk-input" placeholder="Password" required>
+        </div>
+    </div>
     
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
-    
+    <a class="uk-button uk-button-default" type="submit">Register</button>
+
+  </fieldset>
   </form>
 </div>
+<script src='http://localhost:9000/static/js/app.bundle.js'></script>
 {% endblock %}
