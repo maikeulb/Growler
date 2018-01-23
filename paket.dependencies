@@ -3,7 +3,9 @@ framework: net461
 nuget Chessie
 nuget DotLiquid 2.0.64
 nuget FAKE
+nuget FluentMigrator
 nuget FSharp.Core
+nuget Npgsql 3.1.10
 nuget Suave
 nuget Suave.DotLiquid 2.2
 nuget Suave.Experimental 2.2
