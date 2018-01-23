@@ -3,6 +3,7 @@
 body, html {
   height: 100%;
   width: 100%;
+  background-color: #E0E0E0;
 }
 
 #content {
@@ -25,6 +26,10 @@ body, html {
 
 body .uk-navbar-nav>li>a {
   color: #fff;
+}
+
+.uk-navbar-container:not(.uk-navbar-transparent) {
+  background-color: #E0E0E0;
 }
 
 .message {
