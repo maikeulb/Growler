@@ -1,11 +1,16 @@
 @import "~uikit/dist/css/uikit.min.css";
 
-body, html, {
+body, html {
   height: 100%;
   width: 100%;
 }
 
-body .uk-position-relative {
+#content {
+  height: 100%;
+  width: 100%;
+}
+
+.home-container {
   height: 100%;
   width: 100%;
   background-image: url(https://images6.alphacoders.com/656/656326.jpg );
@@ -13,15 +18,13 @@ body .uk-position-relative {
   background-repeat:  no-repeat;
   background-attachment: fixed;
   background-size: cover;
-  background-color: #999;
   margin: 0;
   padding: 0;
   font-family: exo, sans-serif;
-  height: 100%;
 }
-.wrapper {
-  height: 100%;
-  width: 100%;
+
+body .uk-navbar-nav>li>a {
+  color: #fff;
 }
 
 .message {
@@ -40,10 +43,6 @@ body .uk-position-relative {
 }
 
 .message h1{
-  color: #ffffff;
-}
-
-.message .uk-button-info {
   color: #ffffff;
 }
 
