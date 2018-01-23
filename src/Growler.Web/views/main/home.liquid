@@ -5,41 +5,44 @@
 {% endblock %}
 
 {% block content %}
-<div class="uk-position-relative">
+<div id="home">
+
+  <div class="uk-position-relative" style="height:100%;">
     <div class="uk-position-top">
       <div class="uk-container">
         <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
-            <div class="uk-navbar-left">
-                <ul class="uk-navbar-nav">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">Explore</a></li>
-                    <li>
-                        <a href="#">Hello User!</a>
-                        <div class="uk-navbar-dropdown">
-                            <ul class="uk-nav uk-navbar-dropdown-nav">
-                                <li><a href="#">Profile</a></li>
-                                <li class="uk-nav-divider"></li>
-                                <li><a href="#">Logout</a></li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+          <div class="uk-navbar-left">
+            <ul class="uk-navbar-nav">
+              <li><a href="#">Home</a></li>
+              <li><a href="#">Explore</a></li>
+              <li><a href="#">Hello User!</a></li>
+                <div class="uk-navbar-dropdown">
+                  <ul class="uk-nav uk-navbar-dropdown-nav">
+                    <li><a href="#">Profile</a></li>
+                    <li class="uk-nav-divider"></li>
+                    <li><a href="#">Logout</a></li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
         </nav>
       </div>
     </div>
   </div>
 
-<link href='https://fonts.googleapis.com/css?family=Exo:400,900' rel='stylesheet' type='text/css'>
-<div class="wrapper">
-  <div class="message">
-    <div class="uk-container">
-    <h1 class = "uk-heading-primary">Growler</h1>    
-    <p>Yours to discover</p>    
-		<button class="uk-button uk-button-large uk-button-info" href="/signup">Register</button>
-    <button class="uk-button uk-button-large uk-button-default" href="/login">Login</button>
+  <div class="wrapper">
+    <div class="message">
+      <div class="uk-container">
+        <h1 class = "uk-heading-primary">Growler</h1>    
+        <p>Yours to discover</p>    
+        <a class="uk-button uk-button-large uk-button-default"
+          href="/register">Register</a>
+        <a class="uk-button uk-button-large uk-button-default"
+          href="/register">Login</a>
+      </div>
+    </div>
   </div>
-  </div>
-</div>
 
+</div>
 {% endblock %}
