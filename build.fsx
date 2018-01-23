@@ -5,9 +5,6 @@
 
 open Fake
 open Fake.FluentMigratorHelper
-open System.IO
-
-let env = environVar "GROWLER_ENVIRONMENT" 
 
 let buildDir  = "./build/"
 
@@ -28,7 +25,7 @@ Target "BuildMigrations" (fun _ ->
   |> MSBuildDebug buildDir "Build" 
   |> Log "MigrationBuild-Output: "
 )
-let localDbConnString = @"Server=172.17.0.2;Port=5432;Database=Growler;User Id=postgres;Password=P@ssw0rd!;"
+let localDbConnString = @"Server=172.17.0.2;Port=5432;Database=growler;User Id=postgres;Password=P@ssw0rd!;"
 let connString = 
   environVarOrDefault 
     "GROWLER_DB_CONN_STRING"
@@ -40,12 +37,9 @@ Target "RunMigrations" (fun _ ->
   MigrateToLatest dbConnection [migrationsAssembly] DefaultMigrationOptions
 )
 
-let buildConfig = 
-  if env = "dev" then MSBuildDebug else MSBuildRelease
-
 Target "Build" (fun _ ->
-  !! "src/FsTweet.Web/*.fsproj"
-  |> buildConfig buildDir "Build"
+  !! "src/Growler.Web/*.fsproj"
+  |> MSBuildDebug buildDir "Build" 
   |> Log "AppBuild-Output: "
 )
 
@@ -74,6 +68,8 @@ Target "Static" (fun _ ->
 
 // Build order
 "Clean"
+  ==> "BuildMigrations"
+  ==> "RunMigrations"
   ==> "Build"
   ==> "Views"
   ==> "Static"
