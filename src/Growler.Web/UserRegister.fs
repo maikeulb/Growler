@@ -4,6 +4,7 @@ module Domain =
   open Chessie.ErrorHandling
   open BCrypt.Net
   open System.Security.Cryptography
+  open Chessie
 
   type EmailAddress = private EmailAddress of string with
     member this.Value =
@@ -115,16 +116,6 @@ module Domain =
     CreateUser -> SendRegisterEmail -> UserRegisterRequest 
       -> AsyncResult<UserId, UserRegisterError>
 
-  let mapFailure f aResult = 
-    let mapFirstItem xs = 
-      List.head xs |> f |> List.singleton 
-    mapFailure mapFirstItem aResult
-
-  let mapAsyncFailure f aResult =
-    aResult
-    |> Async.ofAsyncResult 
-    |> Async.map (mapFailure f) |> AR
-
   let registerUser (createUser : CreateUser) 
                  (sendEmail : SendRegisterEmail) 
                  (req : UserRegisterRequest) = asyncTrial {
@@ -138,7 +129,7 @@ module Domain =
 
     let! userId = 
       createUser createUserReq
-      |> mapAsyncFailure CreateUserError
+      |> AR.mapFailure CreateUserError
 
     let sendEmailReq = {
       Username = req.Username
@@ -146,7 +137,7 @@ module Domain =
       EmailAddress = createUserReq.Email
     }
     do! sendEmail sendEmailReq 
-        |> mapAsyncFailure SendEmailError
+        |> AR.mapFailure SendEmailError
 
     return userId
   }
@@ -156,6 +147,7 @@ module Persistence =
   open Chessie.ErrorHandling
   open Database
   open System
+  open Chessie
 
   let private mapException (ex : System.Exception) =
     match ex with
@@ -178,7 +170,7 @@ module Persistence =
     newUser.PasswordHash <- createUserReq.PasswordHash.Value
 
     do! submitUpdates context
-        |> mapAsyncFailure mapException
+        |> AR.mapFailure mapException
 
     printfn "User Created %A" newUser.Id
     return UserId newUser.Id
@@ -202,6 +194,7 @@ module Suave =
   open Suave.DotLiquid
   open Suave.Form
   open Database
+  open Chessie
 
   type UserRegisterViewModel = {
     Username : string
@@ -240,21 +233,21 @@ module Suave =
       {viewModel with Error = Some ("something went wrong")}
     page accountTemplatePath viewModel
 
-  let handleUserRegisterError viewModel errs = 
-    match List.head errs with
+  let onUserRegisterFailure viewModel err = 
+    match err with
     | CreateUserError cuErr ->
       handleCreateUserError viewModel cuErr
     | SendEmailError err ->
       handleSendEmailError viewModel err
 
-  let handleUserRegisterSuccess viewModel _ =
+  let onUserRegisterSuccess viewModel _ =
     sprintf "/register/success/%s" viewModel.Username
     |> Redirection.FOUND 
 
   let handleUserRegisterResult viewModel result =
     either 
-      (handleUserRegisterSuccess viewModel)
-      (handleUserRegisterError viewModel) result
+      (onUserRegisterSuccess viewModel)
+      (onUserRegisterFailure viewModel) result
 
   let handleUserRegisterAsyncResult viewModel aResult = 
     aResult

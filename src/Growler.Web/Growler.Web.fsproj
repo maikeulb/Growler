@@ -32,6 +32,7 @@
     <PlatformTarget>$(Platform)</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Chessie.fs" />
     <Compile Include="Db.fs" />
     <Compile Include="UserRegister.fs" />
     <Compile Include="App.fs" />
