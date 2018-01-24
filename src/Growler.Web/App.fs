@@ -37,6 +37,7 @@ let main argv =
       serveStatic
       path "/" >=> page "main/home.liquid" ""
       UserRegister.Suave.webPart getDataContext
+      Auth.Suave.webPart ()
   ]
 
   startWebServer defaultConfig app

@@ -36,6 +36,7 @@
     <Compile Include="Db.fs" />
     <Compile Include="User.fs" />
     <Compile Include="UserRegister.fs" />
+    <Compile Include="Auth.fs" />
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>
