@@ -10,6 +10,7 @@ NUGET
     FluentMigrator (1.6.2)
     FSharp.Core (4.2.2)
     Npgsql (3.1.10)
+    SQLProvider (1.1.7)
     Suave (2.2.1)
       FSharp.Core (>= 4.0.0.1)
     Suave.DotLiquid (2.2)

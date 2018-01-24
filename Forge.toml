@@ -1,5 +1,5 @@
 [alias]
-  run='fake Run'
-  web='-p src/Growler.Web/Growler.Web.fsproj'
-  newFs='new file -t fs'
-  moveUp='move file -u'
+	run='fake Run'
+	web='-p src/Growler.Web/Growler.Web.fsproj'
+	newFs='new file -t fs'
+	moveUp='move file -u'

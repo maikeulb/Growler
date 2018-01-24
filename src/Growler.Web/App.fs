@@ -1,18 +1,20 @@
 module Growler.Main
 
 open Suave
-open Suave.Successful
 open Suave.Operators
 open Suave.Filters
 open Suave.DotLiquid
 open Suave.Files
 open System.Reflection
+open Database
 open System.IO
+open System
 
 let currentPath =
   Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
 
 let initDotLiquid () =
+  setCSharpNamingConvention ()
   let templatesDir = Path.Combine(currentPath, "views")
   setTemplatesDir templatesDir
 
@@ -27,8 +29,9 @@ let serveStatic=
 [<EntryPoint>]
 let main argv =
   initDotLiquid ()
-  setCSharpNamingConvention ()
-
+  let growlerConnString = 
+   Environment.GetEnvironmentVariable  "FSTWEET_DB_CONN_STRING"
+  let getDataCtx = dataContext fsTweetConnString
   let app = 
     choose [
       serveStatic
@@ -38,4 +41,3 @@ let main argv =
 
   startWebServer defaultConfig app
   0
-     

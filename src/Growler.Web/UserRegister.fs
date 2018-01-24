@@ -154,10 +154,38 @@ module Domain =
 module Persistence =
   open Domain
   open Chessie.ErrorHandling
+  open Database
+  open System
+
+  let private mapException (ex : System.Exception) =
+    match ex with
+    | UniqueViolation "IX_Users_Email" _ ->
+      EmailAlreadyExists
+    | UniqueViolation "IX_Users_Username" _ -> 
+      UsernameAlreadyExists
+    | _ -> Error ex
+
+  let createUser (getDataContext : GetDataContext) createUserReq = asyncTrial {
+    let ctx = getDataContext ()
+    let users = context.Public.Users
 
   let createUser createUserReq = asyncTrial {
     printfn "%A created" createUserReq 
     return UserId 1
+
+    let newUser = users.Create()
+    newUser.Email <- createUserReq.Email.Value
+    newUser.EmailVerificationCode <- 
+      createUserReq.VerificationCode.Value
+    newUser.Username <- createUserReq.Username.Value
+    newUser.IsEmailVerified <- false
+    newUser.PasswordHash <- createUserReq.PasswordHash.Value
+
+    do! submitUpdates context
+    |> mapAsyncFailure mapException
+
+    printfn "User Created %A" newUser.Id
+    return UserId newUser.Id
   }
     
 module Email =
@@ -177,6 +205,7 @@ module Suave =
   open Suave.Operators
   open Suave.DotLiquid
   open Suave.Form
+  open Database
 
   type UserRegisterViewModel = {
     Username : string
@@ -236,8 +265,8 @@ module Suave =
     |> Async.ofAsyncResult
     |> Async.map (handleUserRegisterResult viewModel)
 
-  let handleUserRegister registerUser ctx = async {
-    match bindEmptyForm ctx.request with
+  let handleUserRegister registerUser context = async {
+    match bindEmptyForm context.request with
     | Choice1Of2 (vm : UserRegisterViewModel) ->
       let result =
         UserRegisterRequest.TryCreate (vm.Username, vm.Password, vm.Email)
@@ -246,17 +275,17 @@ module Suave =
         let userRegisterAsyncResult = registerUser userRegisterReq
         let! webpart =
           handleUserRegisterAsyncResult vm userRegisterAsyncResult
-        return! webpart ctx
+        return! webpart context
       | Bad msgs ->
         let viewModel = {vm with Error = Some (List.head msgs)}
-        return! page accountTemplatePath viewModel ctx
+        return! page accountTemplatePath viewModel context
     | Choice2Of2 err ->
       let viewModel = {emptyUserRegisterViewModel with Error = Some err}
-      return! page accountTemplatePath viewModel ctx
+      return! page accountTemplatePath viewModel context
   }
 
-  let webPart () =
-    let createUser = Persistence.createUser
+  let webPart get DataContext =
+    let createUser = Persistence.createUser getDataContext
     let sendRegisterEmail = Email.sendRegisterEmail
     let registerUser = Domain.registerUser createUser sendRegisterEmail
     choose [
