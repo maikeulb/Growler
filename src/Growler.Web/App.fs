@@ -30,13 +30,13 @@ let serveStatic=
 let main argv =
   initDotLiquid ()
   let growlerConnString = 
-   Environment.GetEnvironmentVariable  "FSTWEET_DB_CONN_STRING"
-  let getDataCtx = dataContext fsTweetConnString
+   Environment.GetEnvironmentVariable  "GROWLER_DB_CONN_STRING"
+  let getDataContext = dataContext growlerConnString
   let app = 
     choose [
       serveStatic
       path "/" >=> page "main/home.liquid" ""
-      UserRegister.Suave.webPart ()
+      UserRegister.Suave.webPart getDataContext
   ]
 
   startWebServer defaultConfig app

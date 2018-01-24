@@ -166,23 +166,19 @@ module Persistence =
     | _ -> Error ex
 
   let createUser (getDataContext : GetDataContext) createUserReq = asyncTrial {
-    let ctx = getDataContext ()
+    let context = getDataContext ()
     let users = context.Public.Users
-
-  let createUser createUserReq = asyncTrial {
-    printfn "%A created" createUserReq 
-    return UserId 1
 
     let newUser = users.Create()
     newUser.Email <- createUserReq.Email.Value
     newUser.EmailVerificationCode <- 
       createUserReq.VerificationCode.Value
     newUser.Username <- createUserReq.Username.Value
-    newUser.IsEmailVerified <- false
+    newUser.IsEmailVerified <- true
     newUser.PasswordHash <- createUserReq.PasswordHash.Value
 
     do! submitUpdates context
-    |> mapAsyncFailure mapException
+        |> mapAsyncFailure mapException
 
     printfn "User Created %A" newUser.Id
     return UserId newUser.Id
@@ -252,7 +248,7 @@ module Suave =
       handleSendEmailError viewModel err
 
   let handleUserRegisterSuccess viewModel _ =
-    sprintf "/register_/success/%s" viewModel.Username
+    sprintf "/register/success/%s" viewModel.Username
     |> Redirection.FOUND 
 
   let handleUserRegisterResult viewModel result =
@@ -284,7 +280,7 @@ module Suave =
       return! page accountTemplatePath viewModel context
   }
 
-  let webPart get DataContext =
+  let webPart getDataContext =
     let createUser = Persistence.createUser getDataContext
     let sendRegisterEmail = Email.sendRegisterEmail
     let registerUser = Domain.registerUser createUser sendRegisterEmail
