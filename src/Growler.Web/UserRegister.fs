@@ -290,5 +290,5 @@ module Suave =
           GET >=> page accountTemplatePath emptyUserRegisterViewModel
           POST >=> handleUserRegister registerUser
         ]
-      pathScan "/account/success/%s" (page "account/register_success.liquid")
+      pathScan "/register/success/%s" (page "account/register_success.liquid")
     ]
