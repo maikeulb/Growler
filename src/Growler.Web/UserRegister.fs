@@ -260,13 +260,13 @@ module Suave =
       let result =
         UserRegisterRequest.TryCreate (vm.Username, vm.Password, vm.Email)
       match result with
-      | Ok (userRegisterReq, _) ->
+      | Success userRegisterReq ->
         let userRegisterAsyncResult = registerUser userRegisterReq
         let! webpart =
           handleUserRegisterAsyncResult vm userRegisterAsyncResult
         return! webpart context
-      | Bad msgs ->
-        let viewModel = {vm with Error = Some (List.head msgs)}
+      | Failure msg ->
+	let viewModel = {vm with Error = Some msg}
         return! page accountTemplatePath viewModel context
     | Choice2Of2 err ->
       let viewModel = {emptyUserRegisterViewModel with Error = Some err}
