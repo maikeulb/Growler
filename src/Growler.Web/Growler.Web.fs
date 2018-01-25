@@ -41,6 +41,7 @@ let main argv =
       path "/" >=> page "main/home.liquid" ""
       UserRegister.Suave.webPart getDataContext
       Auth.Suave.webPart getDataContext
+      Wall.Suave.webpart ()
   ]
 
   startWebServer defaultConfig app

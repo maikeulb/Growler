@@ -55,6 +55,9 @@ module Suave =
   open Chessie
   open Domain
   open User
+  open Suave.Authentication
+  open Suave.Cookie
+  open Suave.State.CookieStateStore
 
   type LoginViewModel = {
     Username : string
@@ -70,42 +73,97 @@ module Suave =
 
   let loginTemplatePath = "account/login.liquid"
 
-  let renderLoginPage (viewModel : LoginViewModel) = 
-    page loginTemplatePath viewModel
+  let redirectToWallPage = 
+    Redirection.FOUND "/wall"
 
-  let onLoginSuccess (user : User) = 
-    Successful.OK user.Username.Value
+  let renderLoginPage (viewModel : LoginViewModel) hasUserLoggedIn = 
+    match hasUserLoggedIn with
+    | Some _ -> redirectToWallPage
+    | _ -> page loginTemplatePath viewModel
+
+  let userSessionKey = "s3cr3t"
+
+  let setState key value context  =
+    match HttpContext.state context with
+    | Some state ->
+       state.set key value
+    | _ -> never
+
+  let createUserSession (user : User) =
+    statefulForSession 
+    >=> context (setState userSessionKey user)
+    
+  let retrieveUser context : User option =
+    match HttpContext.state context with
+    | Some state -> 
+      state.get userSessionKey
+    | _ -> None
+
+  let initUserSession fFailure fSuccess context =
+    match retrieveUser context with
+    | Some user -> fSuccess user
+    | _ -> fFailure
+
+  let userSession fFailure fSuccess = 
+    statefulForSession 
+    >=> context (initUserSession fFailure fSuccess)
+
+  let optionalUserSession fSuccess =
+    statefulForSession
+    >=> context (fun context -> fSuccess (retrieveUser context))
+
+  let redirectToLoginPage = 
+    Redirection.FOUND "/login"
+
+  let requiresAuth fSuccess =
+    authenticate CookieLife.Session false
+      (fun _ -> Choice2Of2 redirectToLoginPage)
+      (fun _ -> Choice2Of2 redirectToLoginPage)
+      (userSession redirectToLoginPage fSuccess)
+
+  let mayRequiresAuth fSuccess =
+    authenticate CookieLife.Session false
+      (fun _ -> Choice2Of2 (fSuccess None))
+      (fun _ -> Choice2Of2 (fSuccess None))
+      (optionalUserSession fSuccess)
+
+  let onLoginSuccess viewModel (user : User) = 
+    authenticated CookieLife.Session false 
+      >=> createUserSession user
+      >=> redirectToWallPage
 
   let onLoginFailure viewModel loginError =
     match loginError with
     | PasswordMisMatch ->
        let vm = 
         {viewModel with Error = Some "password didn't match"}
-       renderLoginPage vm
+       renderLoginPage vm None
     | EmailNotVerified -> 
        let vm = 
         {viewModel with Error = Some "email not verified"}
-       renderLoginPage vm
+       renderLoginPage vm None
     | UsernameNotFound -> 
        let vm = 
         {viewModel with Error = Some "invalid username"}
-       renderLoginPage vm
+       renderLoginPage vm None
     | Error ex -> 
       printfn "%A" ex
       let vm = 
         {viewModel with Error = Some "something went wrong"}
-      renderLoginPage vm
+      renderLoginPage vm None
     
   let handleLoginResult viewModel loginResult = 
-    either onLoginSuccess (onLoginFailure viewModel) loginResult
+    either 
+      (onLoginSuccess viewModel)
+      (onLoginFailure viewModel) loginResult
 
   let handleLoginAsyncResult viewModel aLoginResult = 
     aLoginResult
     |> Async.ofAsyncResult
     |> Async.map (handleLoginResult viewModel)
 
-  let handleUserLogin findUser context = async {
-    match bindEmptyForm context .request with
+  let handleUserLogin findUser (context : HttpContext) = async {
+    match bindEmptyForm context.request with
     | Choice1Of2 (vm : LoginViewModel) ->
       let result = 
         LoginRequest.TryCreate (vm.Username, vm.Password)
@@ -117,16 +175,16 @@ module Suave =
         return! webpart context
       | Failure err -> 
         let viewModel = {vm with Error = Some err}
-        return! renderLoginPage viewModel context
+        return! renderLoginPage viewModel None context
     | Choice2Of2 err ->
       let viewModel = 
         {emptyLoginViewModel with Error = Some err}
-      return! renderLoginPage viewModel context
-  }
+      return! renderLoginPage viewModel None context
+  } 
 
   let webPart getDataContext =
     let findUser = Persistence.findUser getDataContext
     path "/login" >=> choose [
-      GET >=> renderLoginPage emptyLoginViewModel
+      GET >=> mayRequiresAuth (renderLoginPage emptyLoginViewModel)
       POST >=> handleUserLogin findUser
     ]

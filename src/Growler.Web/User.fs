@@ -59,9 +59,9 @@ module User
   | Verified of EmailAddress
   | NotVerified of EmailAddress
   with member this.Value =
-    match this with
-    | Verified e | NotVerified e -> 
-      e.Value
+        match this with
+        | Verified e | NotVerified e -> 
+          e.Value
 
   type User = {
     UserId : UserId
