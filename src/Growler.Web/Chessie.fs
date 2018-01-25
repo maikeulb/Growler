@@ -33,3 +33,8 @@ module AR =
     |> Async.map ofChoice
     |> AR 
 
+  let fail x =
+    x 
+    |> fail 
+    |> Async.singleton 
+    |> AR

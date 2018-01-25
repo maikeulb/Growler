@@ -3,6 +3,7 @@ namespace Auth
 module Domain = 
   open User
   open Chessie.ErrorHandling
+  open Chessie
 
   type LoginRequest = {
     Username : Username
@@ -18,6 +19,31 @@ module Domain =
           }
         }
 
+  type LoginError =
+  | UsernameNotFound
+  | EmailNotVerified
+  | PasswordMisMatch
+  | Error of System.Exception
+
+  type Login = FindUser -> LoginRequest -> AsyncResult<User, LoginError>
+
+  let login (findUser : FindUser) (req : LoginRequest) = asyncTrial {
+    let! userToFind = 
+      findUser req.Username |> AR.mapFailure Error
+    match userToFind with
+    | None -> 
+      return! AR.fail UsernameNotFound
+    | Some user -> 
+      match user.EmailAddress with
+      | NotVerified _ -> 
+        return! AR.fail EmailNotVerified
+      | Verified _ ->
+        let isMatchingPassword =
+          PasswordHash.VerifyPassword req.Password user.PasswordHash
+        match isMatchingPassword with
+        | false -> return! AR.fail PasswordMisMatch 
+        | _ -> return user
+  }
 
 module Suave =
   open Suave
@@ -28,6 +54,7 @@ module Suave =
   open Chessie.ErrorHandling
   open Chessie
   open Domain
+  open User
 
   type LoginViewModel = {
     Username : string
@@ -41,29 +68,65 @@ module Suave =
     Error = None
   }
 
-  let handleUserLogin context = async {
+  let loginTemplatePath = "account/login.liquid"
+
+  let renderLoginPage (viewModel : LoginViewModel) = 
+    page loginTemplatePath viewModel
+
+  let onLoginSuccess (user : User) = 
+    Successful.OK user.Username.Value
+
+  let onLoginFailure viewModel loginError =
+    match loginError with
+    | PasswordMisMatch ->
+       let vm = 
+        {viewModel with Error = Some "password didn't match"}
+       renderLoginPage vm
+    | EmailNotVerified -> 
+       let vm = 
+        {viewModel with Error = Some "email not verified"}
+       renderLoginPage vm
+    | UsernameNotFound -> 
+       let vm = 
+        {viewModel with Error = Some "invalid username"}
+       renderLoginPage vm
+    | Error ex -> 
+      printfn "%A" ex
+      let vm = 
+        {viewModel with Error = Some "something went wrong"}
+      renderLoginPage vm
+    
+  let handleLoginResult viewModel loginResult = 
+    either onLoginSuccess (onLoginFailure viewModel) loginResult
+
+  let handleLoginAsyncResult viewModel aLoginResult = 
+    aLoginResult
+    |> Async.ofAsyncResult
+    |> Async.map (handleLoginResult viewModel)
+
+  let handleUserLogin findUser context = async {
     match bindEmptyForm context .request with
     | Choice1Of2 (vm : LoginViewModel) ->
       let result = 
         LoginRequest.TryCreate (vm.Username, vm.Password)
       match result with
       | Success req -> 
-        return! Successful.OK "TODO" context
+        let aLoginResult = login findUser req 
+        let! webpart = 
+          handleLoginAsyncResult vm aLoginResult
+        return! webpart context
       | Failure err -> 
-        let viewModel =
-          {vm with Error = Some err}
-        return! page "account/login.liquid" viewModel context
+        let viewModel = {vm with Error = Some err}
+        return! renderLoginPage viewModel context
     | Choice2Of2 err ->
       let viewModel = 
         {emptyLoginViewModel with Error = Some err}
-      return! page "account/login.liquid" viewModel context
+      return! renderLoginPage viewModel context
   }
 
-  let renderLoginPage viewModel = 
-    page "account/login.liquid" viewModel
-
-  let webPart () =
+  let webPart getDataContext =
+    let findUser = Persistence.findUser getDataContext
     path "/login" >=> choose [
       GET >=> renderLoginPage emptyLoginViewModel
-      POST >=> handleUserLogin
+      POST >=> handleUserLogin findUser
     ]
