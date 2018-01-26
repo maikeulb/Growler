@@ -33,9 +33,10 @@
   </nav>
 
 <div class="uk-container">
-  <div class="uk-flex uk-flex-center">
+    <div class="uk-grid uk-flex-center">
 
-    <div class="col-md-4">
+    <div class="uk-width-auto@m">
+      <div class="uk-card uk-card-default uk-card-body">
       <img src="{{model.GravatarUrl}}" alt="" class="gravatar" />
       <p class="gravatar_name">@{{model.Username}}</p>
       {% if model.IsLoggedIn %}
@@ -49,6 +50,7 @@
         <a class="uk-button uk-button-primary" href="/logout">Logout</a>
       {% endif %}
     </div>
+    </div>
 
       {% if model.is_self %}
         <div class="row">
@@ -56,8 +58,9 @@
         </div>     
       {% endif %} 
                
-      <div class="row">
-        <ul class="nav nav-tabs nav-justified">
+      <div class="uk-width-1-2@m">
+      <div class="uk-card uk-card-default uk-card-body">
+        <ul class="uk-tab">
           <li role="presentation" class="active">
             <a href="#tweets" data-toggle="tab">Tweets</a>
           </li>
@@ -81,6 +84,7 @@
     </div>
   </div>
 </div>
+  </div>
 {% endblock %}
 
 {% block scripts %}

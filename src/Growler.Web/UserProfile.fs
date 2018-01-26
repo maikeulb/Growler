@@ -24,7 +24,7 @@ module Domain =
     |> md5.ComputeHash
     |> Array.map (fun b -> b.ToString("x2"))
     |> String.concat ""
-    |> sprintf "http://www.gravatar.com/avatar/%s?s=200"
+    |> sprintf "http://www.gravatar.com/avatar/%s?s=200&d=retro"
 
   let newProfile userProfileType user = { 
     User = user
