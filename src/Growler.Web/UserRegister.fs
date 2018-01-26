@@ -224,9 +224,9 @@ module Suave =
       match result with
       | Success userRegisterReq ->
         let userRegisterAsyncResult = registerUser userRegisterReq
-        let! webpart =
+        let! webPart =
           handleUserRegisterAsyncResult vm userRegisterAsyncResult
-        return! webpart context
+        return! webPart context
       | Failure msg ->
         let viewModel = {vm with Error = Some msg}
         return! page accountTemplatePath viewModel context

@@ -176,9 +176,9 @@ module Suave =
       match result with
       | Success req -> 
         let aLoginResult = login findUser req 
-        let! webpart = 
+        let! webPart = 
           handleLoginAsyncResult vm aLoginResult
-        return! webpart context
+        return! webPart context
       | Failure err -> 
         let viewModel = {vm with Error = Some err}
         return! renderLoginPage viewModel None context
@@ -188,7 +188,7 @@ module Suave =
       return! renderLoginPage viewModel None context
   } 
 
-  let webpart getDataContext =
+  let webPart getDataContext =
     let findUser = Persistence.findUser getDataContext
     choose [
       path "/login" >=> choose [
