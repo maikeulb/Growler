@@ -5,8 +5,35 @@
 {% endblock %}
 
 {% block content %}
+
+  <nav class="uk-navbar-container uk-margin" uk-navbar>
+    <div class="uk-navbar-center">
+        <div class="uk-navbar-center-left"><div>
+            <ul class="uk-navbar-nav">
+                <li><a href="/wall">Wall</a></li>
+                <li>
+                    <a href="#">Parent</a>
+                    <div class="uk-navbar-dropdown">
+                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                            <li><a href="/profile">Profile</a></li>
+                            <li><a href="/logout">Logout</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div></div>
+        <a class="uk-navbar-item uk-logo" href="#">
+        </a>
+        <div class="uk-navbar-center-right"><div>
+            <ul class="uk-navbar-nav">
+                <li><a href="#">Item</a></li>
+            </ul>
+        </div></div>
+    </div>
+  </nav>
+
 <div class="uk-container">
-  <div class="row">
+  <div class="uk-flex uk-flex-center">
 
     <div class="col-md-4">
       <img src="{{model.GravatarUrl}}" alt="" class="gravatar" />

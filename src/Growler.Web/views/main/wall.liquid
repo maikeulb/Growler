@@ -34,21 +34,36 @@
   </nav>
 
   <div class="uk-container">
-    <div class="uk-flex uk-flex-center">
-      <div class="col-md-4">
+    <div class="uk-grid uk-flex-center">
+
+      <div class="uk-width-1-3@m">
+        <div class="uk-card uk-card-default uk-card-body">
         <p class="username">Hi {{model.Username}}</p>
         <a href="/{{model.Username}}" class="uk-button uk-button-primary">My Profile</a>
         <a href="/logout" class="uk-button uk-button-primary">Logout</a>
+
+        </div>
       </div>
-      <div class="col-md-8">
+
+      <div class="uk-width-1-2@m">
+        <div class="uk-card uk-card-default uk-card-body">
         <div class="uk-form-row">  
           <div class="tweet_container">
             <form class="form-tweet" id="tweetForm">
-              <textarea cols="" rows="" id="tweet" name="tweet"></textarea>     
+
+        <fieldset class ="uk-fieldset">
+         <div class="uk-margin">
+            <textarea class="uk-textarea" id="tweet" rows="5" name="tweet"
+              placeholder="Say Something!">
+            </textarea>
+        </div>
               <button class="uk-button uk-button-primary tweet_button pull-right" type="submit"> Tweet </button>
-            </form>
+        </fieldset>
+
+      </form>
           </div>
           <div id="wall" />
+        </div>
         </div>
       </div>
   </div>
