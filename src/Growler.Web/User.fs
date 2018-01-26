@@ -75,8 +75,9 @@ module User
   module Persistence =
     open Database
     open FSharp.Data.Sql
-    open Chessie
-    let mapUser (user : DataContext.``public.UsersEntity``) = 
+    open System
+
+    let mapUserEntityToUser (user : DataContext.``public.UsersEntity``) = 
       let userResult = trial {
         let! username = Username.TryCreate user.Username
         let! passwordHash = PasswordHash.TryCreate user.PasswordHash
@@ -93,9 +94,21 @@ module User
         } 
       }
       userResult
-      |> mapFailure System.Exception
+      |> mapFailure Exception
+
+    let mapUserEntity (user : DataContext.``public.UsersEntity``) = 
+      mapUserEntityToUser user
       |> Async.singleton
       |> AR
+
+    let mapUserEntities (users : DataContext.``public.UsersEntity`` seq) =
+        users
+        |> Seq.map mapUserEntityToUser
+        |> collect
+        |> mapFailure (fun errs -> new AggregateException(errs) :> Exception)
+        |> Async.singleton
+        |> AR
+    
     let findUser (getDataContext : GetDataContext) (username : Username) = asyncTrial {
       let context = getDataContext()
       let! userToFind = 
@@ -105,7 +118,7 @@ module User
         } |> Seq.tryHeadAsync |> AR.catch
       match userToFind with
       | Some user -> 
-        let! user = mapUser user
+        let! user = mapUserEntity user
         return Some user
       | None -> return None
     }
