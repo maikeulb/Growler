@@ -4,6 +4,7 @@
   "description": "",
   "main": "webpack.config.js",
   "dependencies": {
+    "getstream": "^3.12.1",
     "nodemon": "^1.12.1",
     "uikit": "^3.0.0-beta.38"
   },

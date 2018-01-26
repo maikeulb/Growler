@@ -77,6 +77,10 @@ module Suave =
 
   type WallViewModel = {
     Username :  string
+    UserId : int
+    UserFeedToken : string
+    ApiKey : string
+    AppId : string
   }
 
   type PostRequest = PostRequest of string with
@@ -85,9 +89,24 @@ module Suave =
       return PostRequest post 
     }
 
-  let renderWall (user : User) context = async {
-    let vm = {Username = user.Username.Value }
-    return! page "main/wall.liquid" vm context
+  let renderWall 
+    (getStreamClient : GetStream.Client) 
+    (user : User) context  = async {
+
+    let (UserId userId) = user.UserId
+    
+    let userFeed = 
+      GetStream.userFeed getStreamClient userId
+    
+    let vm = {
+      Username = user.Username.Value 
+      UserId = userId
+      UserFeedToken = userFeed.ReadOnlyToken
+      ApiKey = getStreamClient.Config.ApiKey
+      AppId = getStreamClient.Config.AppId}
+
+    return! page "user/wall.liquid" vm context 
+
   }
 
   let onPublishTweetSuccess (TweetId id) = 
@@ -96,15 +115,24 @@ module Suave =
     |> Object
     |> JSON.ok
 
+  let onPublishTweetFailure (err : PublishTweetError) =
+    match err with
+    | NotifyTweetError (tweetId, ex) ->
+      printfn "%A" ex
+      onPublishTweetSuccess tweetId
+    | CreateTweetError ex ->
+      printfn "%A" ex
+      JSON.internalError
+
   let handleNewTweet publishTweet (user : User) context = async {
     match JSON.deserialize context.request  with
     | Success (PostRequest post) -> 
       match Post.TryCreate post with
       | Success post -> 
-        let! webpart = 
+        let! webPart = 
           publishTweet user post
           |> AR.either onPublishTweetSuccess onPublishTweetFailure
-        return! webpart context
+        return! webPart context
       | Failure err -> 
         return! JSON.badRequest err context
     | Failure err -> 
@@ -112,7 +140,7 @@ module Suave =
   }
   
   
-  let webpart getDataContext getStreamClient =
+  let webPart getDataContext getStreamClient =
     let createTweet = Persistence.createTweet getDataContext 
     let notifyTweet = GetStream.notifyTweet getStreamClient
     let publishTweet = publishTweet createTweet notifyTweet

@@ -47,13 +47,15 @@ let main argv =
         Environment.GetEnvironmentVariable "GROWLER_STREAM_APP_ID"
   }
 
+  let getStreamClient = GetStream.newClient streamConfig
+
   let app = 
     choose [
       serveStatic
       path "/" >=> page "main/home.liquid" ""
       UserRegister.Suave.webPart getDataContext
       Auth.Suave.webPart getDataContext
-      Wall.Suave.webPart getDataContext
+      Wall.Suave.webPart getDataContext getStreamClient
   ]
 
   let serverKey = 

@@ -48,6 +48,7 @@
               <button class="uk-button uk-button-primary tweet_button pull-right" type="submit"> Tweet </button>
             </form>
           </div>
+          <div id="wall" />
         </div>
       </div>
   </div>
@@ -55,5 +56,21 @@
 
 
 {% block scripts %}
-<script src="/assets/js/wall.js"></script>
+<script src="/static/js/getstream.js"> </script>
+<script type="text/javascript">
+  window.fsTweet = {
+    user : {
+      id : "{{model.UserId}}",
+      name : "{{model.Username}}",
+      feedToken : "{{model.UserFeedToken}}"
+    },
+    stream : {
+      appId : "{{model.AppId}}",
+      apiKey : "{{model.ApiKey}}"
+    }
+  }  
+</script>
+
+<script src="/static/js/tweet.js"></script>
+<script src="/static/js/wall.js"></script>
 {% endblock %}
