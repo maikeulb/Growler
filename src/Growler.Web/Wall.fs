@@ -34,6 +34,34 @@ module Domain =
     return tweetId
   }
 
+module GetStream = 
+  open Tweet
+  open User
+  open Stream
+  open Chessie.ErrorHandling
+
+  let mapStreamResponse response =
+    match response with
+    | Choice1Of2 _ -> ok ()
+    | Choice2Of2 ex -> fail ex
+  let notifyTweet (getStreamClient: GetStream.Client) (tweet : Tweet) = 
+    
+    let (UserId userId) = tweet.UserId
+    let (TweetId tweetId) = tweet.Id
+    let userFeed =
+      GetStream.userFeed getStreamClient userId
+    
+    let activity = new Activity(userId.ToString(), "tweet", tweetId.ToString())
+    activity.SetData("tweet", tweet.Post.Value)
+    activity.SetData("username", tweet.Username.Value)
+    
+    userFeed.AddActivity(activity)
+    |> Async.AwaitTask
+    |> Async.Catch
+    |> Async.map mapStreamResponse
+    |> AR
+
+
 module Suave =
   open Suave
   open Suave.Filters
@@ -45,6 +73,7 @@ module Suave =
   open Chiron
   open Chessie.ErrorHandling
   open Chessie
+  open Domain
 
   type WallViewModel = {
     Username :  string
@@ -61,35 +90,34 @@ module Suave =
     return! page "main/wall.liquid" vm context
   }
 
-  let onCreateTweetSuccess (TweetId id) = 
+  let onPublishTweetSuccess (TweetId id) = 
     ["id", String (id.ToString())]
     |> Map.ofList
     |> Object
     |> JSON.ok
 
-  let onCreateTweetFailure (ex : System.Exception) =
-    printfn "%A" ex
-    JSON.internalError
-
-  let handleNewTweet createTweet (user : User) context = async {
+  let handleNewTweet publishTweet (user : User) context = async {
     match JSON.deserialize context.request  with
     | Success (PostRequest post) -> 
       match Post.TryCreate post with
       | Success post -> 
-        let! webPart = 
-          createTweet user.UserId post
-          |> AR.either onCreateTweetSuccess onCreateTweetFailure
-        return! webPart context
+        let! webpart = 
+          publishTweet user post
+          |> AR.either onPublishTweetSuccess onPublishTweetFailure
+        return! webpart context
       | Failure err -> 
         return! JSON.badRequest err context
     | Failure err -> 
       return! JSON.badRequest err context
   }
   
-  let webPart getDataContext =
+  
+  let webpart getDataContext getStreamClient =
     let createTweet = Persistence.createTweet getDataContext 
+    let notifyTweet = GetStream.notifyTweet getStreamClient
+    let publishTweet = publishTweet createTweet notifyTweet
     choose [
-      path "/wall" >=> requiresAuth renderWall
+      path "/wall" >=> requiresAuth (renderWall getStreamClient)
       POST >=> path "/tweets"  
-        >=> requiresAuth2 (handleNewTweet createTweet)  
+        >=> requiresAuth2 (handleNewTweet publishTweet)  
     ]
