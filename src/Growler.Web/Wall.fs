@@ -139,7 +139,6 @@ module Suave =
       return! JSON.badRequest err context
   }
   
-  
   let webPart getDataContext getStreamClient =
     let createTweet = Persistence.createTweet getDataContext 
     let notifyTweet = GetStream.notifyTweet getStreamClient

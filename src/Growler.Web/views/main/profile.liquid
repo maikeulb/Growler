@@ -1,0 +1,74 @@
+{% extends "base.liquid" %}
+
+{% block head %}
+  <title> {{model.Username}} - Growler </title>
+{% endblock %}
+
+{% block content %}
+<div class="uk-container">
+  <div class="row">
+    <div class="col-md-4">
+      <img src="{{model.GravatarUrl}}" alt="" class="gravatar" />
+      <p class="gravatar_name">@{{model.Username}}</p>
+      {% if model.IsLoggedIn %}
+        {% unless model.IsSelf %}
+          <a class="btn btn-primary" href="#" id="follow" data-username="{{model.username}}">Follow</a>
+        {% endunless %}
+        <a class="btn btn-primary" href="/logout">Logout</a>
+      {% endif %}
+    </div>
+     <div class="col-md-8">
+      
+      {% if model.is_self %}
+        <div class="row">
+          {% include '_post.liquid' %}   
+        </div>     
+      {% endif %} 
+               
+      <div class="row">
+        <ul class="nav nav-tabs nav-justified">
+          <li role="presentation" class="active">
+            <a href="#tweets" data-toggle="tab">Tweets</a>
+          </li>
+          <li role="presentation">
+            <a href="#following" data-toggle="tab">Following <span class="badge" id="followingCount">0</span></a>
+          </li>
+          <li role="presentation">
+            <a href="#followers" data-toggle="tab">Followers <span class="badge" id="followersCount">0</span></a>
+          </li>
+        </ul>        
+        
+        <div class="tab-content">     
+          <div id="tweets" class="tab-pane fade in active">           
+          </div>
+          <div id="following" class="tab-pane fade">            
+          </div>
+          <div id="followers" class="tab-pane fade">            
+          </div>
+        </div>
+      </div>      
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/lib/getstream.js"> </script>
+
+<script type="text/javascript">
+  window.growler = {
+    user : {
+      id : "{{model.UserId}}",
+      name : "{{model.Username}}",
+      feedToken : "{{model.UserFeedToken}}"
+    },
+    stream : {
+      appId : "{{model.AppId}}",
+      apiKey : "{{model.ApiKey}}"
+    }
+  }  
+</script>
+
+<script src="/static/js/tweet.js"></script>
+<script src="/static/js/profile.js"></script>
+{% endblock %}

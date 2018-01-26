@@ -56,6 +56,7 @@ let main argv =
       UserRegister.Suave.webPart getDataContext
       Auth.Suave.webPart getDataContext
       Wall.Suave.webPart getDataContext getStreamClient
+      UserProfile.Suave.webPart getDataContext getStreamClient
   ]
 
   let serverKey = 
