@@ -1,0 +1,59 @@
+{% extends "base.liquid" %}
+
+{% block head %}
+  <title> {{model.Username}}  </title>
+{% endblock %}
+
+{% block content %}
+
+  <nav class="uk-navbar-container uk-margin" uk-navbar>
+    <div class="uk-navbar-center">
+        <div class="uk-navbar-center-left"><div>
+            <ul class="uk-navbar-nav">
+                <li><a href="#">Explore</a></li>
+                <li>
+                    <a href="#">Parent</a>
+                    <div class="uk-navbar-dropdown">
+                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                            <li class="uk-active"><a href="#">Active</a></li>
+                            <li><a href="#">Item</a></li>
+                            <li><a href="#">Item</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div></div>
+        <a class="uk-navbar-item uk-logo" href="#">
+        </a>
+        <div class="uk-navbar-center-right"><div>
+            <ul class="uk-navbar-nav">
+                <li><a href="#">Item</a></li>
+            </ul>
+        </div></div>
+    </div>
+  </nav>
+
+  <div class="uk-container">
+    <div class="uk-flex uk-flex-center">
+      <div class="col-md-4">
+        <p class="username">Hi {{model.Username}}</p>
+        <a href="/{{model.Username}}" class="uk-button uk-button-primary">My Profile</a>
+        <a href="/logout" class="uk-button uk-button-primary">Logout</a>
+      </div>
+      <div class="col-md-8">
+        <div class="uk-form-row">  
+          <div class="tweet_container">
+            <form class="form-tweet" id="tweetForm">
+              <textarea cols="" rows="" id="tweet" name="tweet"></textarea>     
+              <button class="uk-button uk-button-primary tweet_button pull-right" type="submit"> Tweet </button>
+            </form>
+          </div>
+        </div>
+      </div>
+  </div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="/assets/js/wall.js"></script>
+{% endblock %}

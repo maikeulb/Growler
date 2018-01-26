@@ -115,11 +115,17 @@ module Suave =
   let redirectToLoginPage = 
     Redirection.FOUND "/login"
 
-  let requiresAuth fSuccess =
+  let onAuthenticate fSuccess fFailure =
     authenticate CookieLife.Session false
-      (fun _ -> Choice2Of2 redirectToLoginPage)
-      (fun _ -> Choice2Of2 redirectToLoginPage)
-      (userSession redirectToLoginPage fSuccess)
+      (fun _ -> Choice2Of2 fFailure)
+      (fun _ -> Choice2Of2 fFailure)
+      (userSession fFailure fSuccess)
+
+  let requiresAuth fSuccess =
+    onAuthenticate fSuccess redirectToLoginPage
+
+  let requiresAuth2 fSuccess =
+    onAuthenticate fSuccess JSON.unauthorized
 
   let mayRequiresAuth fSuccess =
     authenticate CookieLife.Session false

@@ -44,7 +44,7 @@ let main argv =
       path "/" >=> page "main/home.liquid" ""
       UserRegister.Suave.webPart getDataContext
       Auth.Suave.webPart getDataContext
-      Wall.Suave.webpart ()
+      Wall.Suave.webPart getDataContext
   ]
 
   let serverKey = 

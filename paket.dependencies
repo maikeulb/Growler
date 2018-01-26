@@ -2,6 +2,7 @@ source https://www.nuget.org/api/v2
 framework: net461
 nuget BCrypt.Net-Next 2.1.1
 nuget Chessie
+nuget Chiron 6.2.1
 nuget DotLiquid 2.0.64
 nuget FAKE
 nuget FluentMigrator

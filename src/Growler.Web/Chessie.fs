@@ -38,3 +38,8 @@ module AR =
     |> fail 
     |> Async.singleton 
     |> AR
+
+  let either onSuccess onFailure aResult = 
+    aResult
+    |> Async.ofAsyncResult
+    |> Async.map (either onSuccess onFailure)
