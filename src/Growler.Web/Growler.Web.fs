@@ -38,6 +38,15 @@ let main argv =
   let env = 
     Environment.GetEnvironmentVariable "GROWLER_ENVIRONMENT"
 
+  let streamConfig : GetStream.Config = {
+      ApiKey = 
+        Environment.GetEnvironmentVariable "GROWLER_STREAM_KEY"
+      ApiSecret = 
+        Environment.GetEnvironmentVariable "GROWLER_STREAM_SECRET"
+      AppId = 
+        Environment.GetEnvironmentVariable "GROWLER_STREAM_APP_ID"
+  }
+
   let app = 
     choose [
       serveStatic

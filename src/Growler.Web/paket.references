@@ -8,3 +8,4 @@ BCrypt.Net-Next
 SQLProvider
 Npgsql
 Chiron
+stream-net

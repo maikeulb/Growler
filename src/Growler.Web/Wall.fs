@@ -1,5 +1,39 @@
 namespace Wall
 
+module Domain = 
+  open User
+  open Tweet
+  open Chessie.ErrorHandling
+  open System
+  open Chessie
+
+  type NotifyTweet = Tweet -> AsyncResult<unit, Exception>
+
+  type PublishTweetError =
+  | CreateTweetError of Exception
+  | NotifyTweetError of (TweetId * Exception)
+
+  type PublishTweet =
+    CreateTweet -> NotifyTweet -> 
+      User -> Post -> AsyncResult<TweetId, PublishTweetError>
+
+  let publishTweet createTweet notifyTweet (user : User) post = asyncTrial {
+    let! tweetId = 
+      createTweet user.UserId post
+      |> AR.mapFailure CreateTweetError
+
+    let tweet = {
+      Id = tweetId
+      UserId = user.UserId
+      Username = user.Username
+      Post = post
+    }
+    do! notifyTweet tweet 
+        |> AR.mapFailure (fun ex -> NotifyTweetError(tweetId, ex))
+
+    return tweetId
+  }
+
 module Suave =
   open Suave
   open Suave.Filters

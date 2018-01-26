@@ -16,6 +16,12 @@ type Post = private Post of string with
 
 type CreateTweet = UserId -> Post -> AsyncResult<TweetId, System.Exception>
 
+type Tweet = {
+  UserId : UserId
+  Username : Username
+  Id : TweetId
+  Post : Post
+}
 
 module Persistence =
 

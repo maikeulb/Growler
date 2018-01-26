@@ -9,6 +9,7 @@ nuget FluentMigrator
 nuget FSharp.Core
 nuget Npgsql 3.1.10
 nuget SQLProvider 1.1.7
+nuget stream-net 1.3.2
 nuget Suave
 nuget Suave.DotLiquid 2.2
 nuget Suave.Experimental 2.2
