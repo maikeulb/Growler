@@ -105,7 +105,7 @@ module Suave =
       ApiKey = getStreamClient.Config.ApiKey
       AppId = getStreamClient.Config.AppId}
 
-    return! page "user/wall.liquid" vm context 
+    return! page "main/wall.liquid" vm context 
 
   }
 

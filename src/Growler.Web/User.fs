@@ -96,11 +96,11 @@ module User
       |> mapFailure System.Exception
       |> Async.singleton
       |> AR
-    let findUser (getDataCtx : GetDataContext) (username : Username) = asyncTrial {
-      let ctx = getDataCtx()
+    let findUser (getDataContext : GetDataContext) (username : Username) = asyncTrial {
+      let context = getDataContext()
       let! userToFind = 
         query {
-          for u in ctx.Public.Users do
+          for u in context.Public.Users do
             where (u.Username = username.Value)
         } |> Seq.tryHeadAsync |> AR.catch
       match userToFind with
