@@ -7,6 +7,7 @@ open Fake
 open Fake.FluentMigratorHelper
 
 let buildDir  = "./build/"
+let deployDir = "./deploy/"
 
 let migrationsAssembly = 
   combinePaths buildDir "Growler.Db.Migrations.dll"
@@ -17,7 +18,7 @@ let appReferences  =
 
 // Targets
 Target "Clean" (fun _ ->
-    CleanDirs [buildDir]
+  CleanDirs [buildDir; deployDir]
 )
 
 Target "BuildMigrations" (fun _ ->
@@ -25,11 +26,13 @@ Target "BuildMigrations" (fun _ ->
   |> MSBuildDebug buildDir "Build" 
   |> Log "MigrationBuild-Output: "
 )
+
 let localDbConnString = @"Server=172.17.0.2;Port=5432;Database=growler;User Id=postgres;Password=P@ssw0rd!;"
 let connString = 
   environVarOrDefault 
     "GROWLER_DB_CONN_STRING"
     localDbConnString
+
 setEnvironVar "GROWLER_DB_CONN_STRING" connString
 let dbConnection = ConnectionString (connString, DatabaseProvider.PostgreSQL)
 

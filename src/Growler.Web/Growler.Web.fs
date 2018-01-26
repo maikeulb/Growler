@@ -35,6 +35,9 @@ let main argv =
 
   let getDataContext = dataContext growlerConnString
 
+  let env = 
+    Environment.GetEnvironmentVariable "GROWLER_ENVIRONMENT"
+
   let app = 
     choose [
       serveStatic
@@ -44,5 +47,11 @@ let main argv =
       Wall.Suave.webpart ()
   ]
 
-  startWebServer defaultConfig app
+  let serverKey = 
+    Environment.GetEnvironmentVariable "GROWLER_SERVER_KEY"
+    |> ServerKey.fromBase64
+  let serverConfig = 
+    {defaultConfig with serverKey = serverKey}
+
+  startWebServer serverConfig app
   0
