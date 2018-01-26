@@ -128,7 +128,7 @@ module Suave =
     printfn "%A" ex
     page "server_error.liquid" "something went wrong"
 
-  let renderUserProfile newUserProfileViewModel findUserProfile username loggedInUser  context  = async {
+  let renderUserProfile newUserProfileViewModel findUserProfile username loggedInUser context  = async {
     match Username.TryCreate username with
     | Success validatedUsername -> 
       let isLoggedIn = Option.isSome loggedInUser

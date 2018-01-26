@@ -228,6 +228,7 @@
       </ItemGroup>
     </When>
   </Choose>
+
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.1'">
       <ItemGroup>
@@ -239,6 +240,7 @@
       </ItemGroup>
     </When>
   </Choose>
+
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.1'">
       <ItemGroup>

@@ -24,7 +24,7 @@ body, html {
   font-family: exo, sans-serif;
 }
 
-body .uk-navbar-nav>li>a {
+body .home-container .uk-navbar-nav>li>a {
   color: #fff;
 }
 
@@ -57,4 +57,5 @@ body .uk-navbar-nav>li>a {
 
 .uk-card {
   border: 0.5px solid #DDD;
+  box-shadow: none;
 }

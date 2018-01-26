@@ -10,30 +10,31 @@
     <div class="uk-navbar-center">
         <div class="uk-navbar-center-left"><div>
             <ul class="uk-navbar-nav">
-                <li><a href="/wall">Wall</a></li>
+                <li><a href="/wall">Tweet!</a></li>
+            </ul>
+        </div></div>
+        <a class="uk-navbar-item uk-logo" href="#">
+          <img class="uk-border-circle" width="220"
+          src="http://diylogodesigns.com/blog/wp-content/uploads/2016/01/creative-owl-bird-logo-design.png">
+        </a>
+        <div class="uk-navbar-center-right"><div>
+            <ul class="uk-navbar-nav">
                 <li>
-                    <a href="#">Parent</a>
+                  <a href="#">Hello {{model.Username}}</a>
                     <div class="uk-navbar-dropdown">
                         <ul class="uk-nav uk-navbar-dropdown-nav">
-                            <li><a href="/profile">Profile</a></li>
+                          <li><a href="/{{model.Username}}">Profile</a></li>
                             <li><a href="/logout">Logout</a></li>
                         </ul>
                     </div>
                 </li>
             </ul>
         </div></div>
-        <a class="uk-navbar-item uk-logo" href="#">
-        </a>
-        <div class="uk-navbar-center-right"><div>
-            <ul class="uk-navbar-nav">
-                <li><a href="#">Item</a></li>
-            </ul>
-        </div></div>
     </div>
   </nav>
 
-<div class="uk-container">
-    <div class="uk-grid uk-flex-center">
+  <div class="uk-container uk-margin-large-top">
+    <div class="uk-grid-small uk-flex-center" uk-grid>
 
     <div class="uk-width-auto@m">
       <div class="uk-card uk-card-default uk-card-body">
@@ -47,7 +48,6 @@
             <a class="uk-button uk-button-primary" href="#" id="follow" data-user-id="{{model.UserId}}">Follow</a>
           {% endif %}
         {% endunless %}
-        <a class="uk-button uk-button-primary" href="/logout">Logout</a>
       {% endif %}
     </div>
     </div>
@@ -60,7 +60,8 @@
                
       <div class="uk-width-1-2@m">
       <div class="uk-card uk-card-default uk-card-body">
-        <ul class="uk-tab">
+
+        <ul uk-tab>
           <li role="presentation" class="active">
             <a href="#tweets" data-toggle="tab">Tweets</a>
           </li>
@@ -72,14 +73,15 @@
           </li>
         </ul>        
         
-        <div class="tab-content">     
-          <div id="tweets" class="tab-pane fade in active">           
-          </div>
-          <div id="following" class="tab-pane fade">            
-          </div>
-          <div id="followers" class="tab-pane fade">            
-          </div>
-        </div>
+        <ul class="uk-switcher uk-margin">
+          <li id="tweets" class="tab-pane fade in active">           
+          </li>
+          <li id="following" class="tab-pane fade">            
+          </li>
+          <li id="followers" class="tab-pane fade">            
+          </li>
+        </ul>
+
       </div>      
     </div>
   </div>

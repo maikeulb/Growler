@@ -1,0 +1,14 @@
+1. Fix navbar (display current user)
+3. Add Favorite Tweets
+4. Add ability to unfollow
+6. Add Pagination
+7. Add more toastr (login, logout)
+8. Add notifications
+9. instead of storing user info in a cookie, store and
+
+
+
+
+
+
+
