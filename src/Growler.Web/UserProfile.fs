@@ -5,6 +5,7 @@ module Domain =
   open System.Security.Cryptography
   open Chessie.ErrorHandling
   open System
+  open Social.Domain
 
   type UserProfileType =
   | Self
@@ -67,6 +68,7 @@ module Suave =
   open Auth.Suave
   open Suave
   open Domain
+  open Social
   open User
   open Suave.DotLiquid
   open Chessie.ErrorHandling
@@ -140,10 +142,10 @@ module Suave =
       return! renderProfileNotFound context
   }
 
-
   let webPart (getDataContext : GetDataContext) getStreamClient = 
     let findUser = Persistence.findUser getDataContext
-    let findUserProfile = findUserProfile findUser
+    let isFollowing = Persistence.isFollowing getDataContext
+    let findUserProfile = findUserProfile findUser isFollowing
     let newUserProfileViewModel = newUserProfileViewModel getStreamClient
     let renderUserProfile = renderUserProfile newUserProfileViewModel findUserProfile
     pathScan "/%s" (fun username -> mayRequiresAuth(renderUserProfile username))

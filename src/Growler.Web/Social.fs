@@ -18,6 +18,8 @@ module Domain =
 
   } 
 
+  type IsFollowing = User -> UserId -> AsyncResult<bool, Exception>
+
 module Persistence =
   open Database
   open User
@@ -36,6 +38,20 @@ module Persistence =
 
      submitUpdates context
 
+  let isFollowing (getDataContext : GetDataContext) (user : User) (UserId userId) = asyncTrial {
+    let context = getDataContext ()
+    let (UserId followerUserId) = user.UserId
+
+    let! relationship = 
+      query {
+        for s in context.Public.Social do
+          where (s.FollowerUserId = followerUserId && 
+                  s.FollowingUserId = userId)
+      } |> Seq.tryHeadAsync |> AR.catch
+
+    return relationship.IsSome
+  }
+   
 module GetStream = 
   open User
   open Chessie
