@@ -28,7 +28,7 @@ type CreateGrowlTable()=
       .WithColumn("Id").AsGuid().PrimaryKey()
       .WithColumn("Post").AsString(144).NotNullable()
       .WithColumn("UserId").AsInt32().ForeignKey("Users", "Id")
-      .WithColumn("GrolwedAt").AsDateTimeOffset().NotNullable()
+      .WithColumn("GrowledAt").AsDateTimeOffset().NotNullable()
     |> ignore
   
   override this.Down() = 
