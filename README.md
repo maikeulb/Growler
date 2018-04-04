@@ -15,13 +15,13 @@ Technology
 Screenshots
 ---------
 ### Main
-![main](/screenshots/main.png?raw=true "Post")
+![main](/screenshots/main.png?raw=true "Main")
 
 ### Wall
-![wall](/screenshots/wall.png?raw=true "Post")
+![wall](/screenshots/wall.png?raw=true "Wall")
 
 ### Profile
-![profile](/screenshots/profile.png?raw=true "Post")
+![profile](/screenshots/profile.png?raw=true "Profile")
 
 Run
 ---
@@ -42,6 +42,16 @@ Go to http://localhost:8080
 TODO
 ----
 Dockerfile  
-Add unfollowing feature  
 Add trending feature  
-Add like feature
+Add favorite Growls  
+Add notifications  
+Fix navbar (display current user)  
+Add ability to unfollow  
+Add Pagination
+
+
+
+
+
+
+
