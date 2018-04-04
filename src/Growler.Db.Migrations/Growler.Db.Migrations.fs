@@ -19,20 +19,20 @@ type CreateUserTable()=
   override this.Down() = 
     base.Delete.Table("Users") |> ignore
 
-[<Migration(201801251212L, "Creating Tweet Table")>]
-type CreateTweetTable()=
+[<Migration(201801251212L, "Creating Growl Table")>]
+type CreateGrowlTable()=
   inherit Migration()
 
   override this.Up() =
-    base.Create.Table("Tweets")
+    base.Create.Table("Growls")
       .WithColumn("Id").AsGuid().PrimaryKey()
       .WithColumn("Post").AsString(144).NotNullable()
       .WithColumn("UserId").AsInt32().ForeignKey("Users", "Id")
-      .WithColumn("TweetedAt").AsDateTimeOffset().NotNullable()
+      .WithColumn("GrolwedAt").AsDateTimeOffset().NotNullable()
     |> ignore
   
   override this.Down() = 
-    base.Delete.Table("Tweets") |> ignore
+    base.Delete.Table("Growls") |> ignore
 
 [<Migration(201801240554L, "Creating Social Table")>]
 type CreateSocialTable()=

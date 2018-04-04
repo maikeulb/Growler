@@ -23,7 +23,6 @@ type Db = SqlDataProvider<
 
 type DataContext = Db.dataContext
 
-
 type GetDataContext = unit -> DataContext
 let dataContext (connString : string) : GetDataContext =
   let isMono = 

@@ -17,6 +17,7 @@ module Domain =
     GravatarUrl : string
     UserProfileType : UserProfileType
   }
+
   let gravatarUrl (emailAddress : UserEmailAddress) =
     use md5 = MD5.Create()
     emailAddress.Value.Trim().ToLowerInvariant()  

@@ -2,40 +2,40 @@ namespace Wall
 
 module Domain = 
   open User
-  open Tweet
+  open Growl
   open Chessie.ErrorHandling
   open System
   open Chessie
 
-  type NotifyTweet = Tweet -> AsyncResult<unit, Exception>
+  type NotifyGrowl = Growl -> AsyncResult<unit, Exception>
 
-  type PublishTweetError =
-  | CreateTweetError of Exception
-  | NotifyTweetError of (TweetId * Exception)
+  type PublishGrowlError =
+  | CreateGrowlError of Exception
+  | NotifyGrowlError of (GrowlId * Exception)
 
-  type PublishTweet =
-    CreateTweet -> NotifyTweet -> 
-      User -> Post -> AsyncResult<TweetId, PublishTweetError>
+  type PublishGrowl =
+    CreateGrowl -> NotifyGrowl -> 
+      User -> Post -> AsyncResult<GrowlId, PublishGrowlError>
 
-  let publishTweet createTweet notifyTweet (user : User) post = asyncTrial {
-    let! tweetId = 
-      createTweet user.UserId post
-      |> AR.mapFailure CreateTweetError
+  let publishGrowl createGrowl notifyGrowl (user : User) post = asyncTrial {
+    let! growlId = 
+      createGrowl user.UserId post
+      |> AR.mapFailure CreateGrowlError
 
-    let tweet = {
-      Id = tweetId
+    let growl = {
+      Id = growlId
       UserId = user.UserId
       Username = user.Username
       Post = post
     }
-    do! notifyTweet tweet 
-        |> AR.mapFailure (fun ex -> NotifyTweetError(tweetId, ex))
+    do! notifyGrowl growl 
+        |> AR.mapFailure (fun ex -> NotifyGrowlError(growlId, ex))
 
-    return tweetId
+    return growlId
   }
 
 module GetStream = 
-  open Tweet
+  open Growl
   open User
   open Stream
   open Chessie.ErrorHandling
@@ -44,16 +44,16 @@ module GetStream =
     match response with
     | Choice1Of2 _ -> ok ()
     | Choice2Of2 ex -> fail ex
-  let notifyTweet (getStreamClient: GetStream.Client) (tweet : Tweet) = 
+  let notifyGrowl (getStreamClient: GetStream.Client) (growl : Growl) = 
     
-    let (UserId userId) = tweet.UserId
-    let (TweetId tweetId) = tweet.Id
+    let (UserId userId) = growl.UserId
+    let (GrowlId growlId) = growl.Id
     let userFeed =
       GetStream.userFeed getStreamClient userId
     
-    let activity = new Activity(userId.ToString(), "tweet", tweetId.ToString())
-    activity.SetData("tweet", tweet.Post.Value)
-    activity.SetData("username", tweet.Username.Value)
+    let activity = new Activity(userId.ToString(), "growl", growlId.ToString())
+    activity.SetData("growl", growl.Post.Value)
+    activity.SetData("username", growl.Username.Value)
     
     userFeed.AddActivity(activity)
     |> Async.AwaitTask
@@ -69,7 +69,7 @@ module Suave =
   open User
   open Auth.Suave
   open Suave.DotLiquid
-  open Tweet
+  open Growl
   open Chiron
   open Chessie.ErrorHandling
   open Chessie
@@ -114,29 +114,29 @@ module Suave =
 
   }
 
-  let onPublishTweetSuccess (TweetId id) = 
+  let onPublishGrowlSuccess (GrowlId id) = 
     ["id", String (id.ToString())]
     |> Map.ofList
     |> Object
     |> JSON.ok
 
-  let onPublishTweetFailure (err : PublishTweetError) =
+  let onPublishGrowlFailure (err : PublishGrowlError) =
     match err with
-    | NotifyTweetError (tweetId, ex) ->
+    | NotifyGrowlError (growlId, ex) ->
       printfn "%A" ex
-      onPublishTweetSuccess tweetId
-    | CreateTweetError ex ->
+      onPublishGrowlSuccess growlId
+    | CreateGrowlError ex ->
       printfn "%A" ex
       JSON.internalError
 
-  let handleNewTweet publishTweet (user : User) context = async {
+  let handleNewGrowl publishGrowl (user : User) context = async {
     match JSON.deserialize context.request  with
     | Success (PostRequest post) -> 
       match Post.TryCreate post with
       | Success post -> 
         let! webPart = 
-          publishTweet user post
-          |> AR.either onPublishTweetSuccess onPublishTweetFailure
+          publishGrowl user post
+          |> AR.either onPublishGrowlSuccess onPublishGrowlFailure
         return! webPart context
       | Failure err -> 
         return! JSON.badRequest err context
@@ -145,11 +145,11 @@ module Suave =
   }
   
   let webPart getDataContext getStreamClient =
-    let createTweet = Persistence.createTweet getDataContext 
-    let notifyTweet = GetStream.notifyTweet getStreamClient
-    let publishTweet = publishTweet createTweet notifyTweet
+    let createGrowl = Persistence.createGrowl getDataContext 
+    let notifyGrowl = GetStream.notifyGrowl getStreamClient
+    let publishGrowl = publishGrowl createGrowl notifyGrowl
     choose [
       path "/wall" >=> requiresAuth (renderWall getStreamClient)
-      POST >=> path "/tweets"  
-        >=> requiresAuth2 (handleNewTweet publishTweet)  
+      POST >=> path "/growls"  
+        >=> requiresAuth2 (handleNewGrowl publishGrowl)  
     ]
