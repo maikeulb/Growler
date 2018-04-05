@@ -25,12 +25,10 @@ Screenshots
 
 Run
 ---
-You will need Mono, Forge, Fake, and a stream account (it's free, you can sign up
-[here]("https://getstream.io/") ).
-If you meet those requirements, then: create a database, open `build.fsx` and point the database URI to your server,
-open `Growler.Web.fs` and set your Api keys.
-
-After that has been taken care of,
+You need Mono, Forge, Fake, and a stream account (it's free, you can sign up
+[here]("https://getstream.io/") ). If you meet those requirements, then: create
+a database named 'Growler', open `build.fsx` and point the database URI to your
+server, and then open `Growler.Web.fs` and set your Api keys.
 
 ```
 npm install
@@ -41,17 +39,11 @@ Go to http://localhost:8080
 
 TODO
 ----
-Dockerfile  
+Add Dockerfile  
 Add trending feature  
-Add favorite Growls  
+Add favorite growls  
 Add notifications  
 Fix navbar (display current user)  
 Add ability to unfollow  
-Add Pagination
-
-
-
-
-
-
-
+Add pagination  
+Clean up assets 
